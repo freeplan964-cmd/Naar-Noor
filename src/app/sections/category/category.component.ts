@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CATEGORIES_DATA } from '../../../data/category.data';
 
 @Component({
   selector: 'app-category',
@@ -9,22 +10,5 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./category.component.css']
 })
 export class CategoryComponent {
-  categories = [
-    {
-      title: 'Starters',
-      image: 'assets/categories/Starters.jpg'
-    },
-    {
-      title: 'Grill & BBQ',
-      image: 'assets/cinematic/Grill-BBQ.jpg'
-    },
-    {
-      title: 'Himalayan Mains',
-      image: 'assets/categories/Himalayan-Mains.jpg'
-    },
-    {
-      title: 'Cocktails',
-      image: 'assets/categories/Cocktails.jpg'
-    }
-  ];
+  categories = CATEGORIES_DATA;
 }
