@@ -50,6 +50,18 @@ export interface CreateReservationResponse {
   id: string;
 }
 
+export interface CreateContactRequest {
+  name: string;
+  email: string;
+  phoneNumber?: string;
+  subject: string;
+  message: string;
+}
+
+export interface CreateContactResponse {
+  id: string;
+}
+
 export interface CreateOrderRequest {
   customerName: string;
   email: string;
@@ -94,6 +106,10 @@ export class ApiService {
 
   createReservation(data: CreateReservationRequest): Observable<CreateReservationResponse> {
     return this.http.post<CreateReservationResponse>(`${this.baseUrl}/reservations`, data);
+  }
+
+  createContact(data: CreateContactRequest): Observable<CreateContactResponse> {
+    return this.http.post<CreateContactResponse>(`${this.baseUrl}/contact`, data);
   }
 
   createOrder(data: CreateOrderRequest): Observable<CreateOrderResponse> {

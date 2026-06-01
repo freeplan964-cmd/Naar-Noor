@@ -22,7 +22,7 @@ public class ReservationsController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateReservationCommand command, CancellationToken cancellationToken)
     {
         var id = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetAll), new { id }, new { id });
+        return Created(string.Empty, new { id });
     }
 
     [HttpGet]
