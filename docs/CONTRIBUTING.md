@@ -709,3 +709,278 @@ By contributing to Naar & Noor, you agree that your contributions will be licens
 Thank you for taking the time to contribute to **Naar & Noor**! Your contributions help make this project better for everyone.
 
 **Happy Coding! 🚀**
+
+
+## 🧪 Testing Requirements
+
+### Before Submitting PR
+
+All contributions must include appropriate tests:
+
+#### Backend Tests
+
+For any backend changes (C# / .NET):
+
+1. **Unit Tests** - Test individual methods
+   ```bash
+   cd api-server
+   dotnet test
+   ```
+
+2. **Property Tests** - Use FsCheck for complex logic (100 iterations)
+   ```csharp
+   [Property(MaxTest = 100)]
+   public async Task YourPropertyTest(string input)
+   {
+       // Test implementation
+   }
+   ```
+
+3. **Coverage Requirements**
+   - Domain: 85%+ coverage
+   - Application: 82%+ coverage
+   - Infrastructure: 78%+ coverage
+   - API: 80%+ coverage
+
+   Verify coverage locally:
+   ```bash
+   python scripts/validate-coverage.py --backend-dir api-server/tests
+   ```
+
+#### Frontend Tests
+
+For any frontend changes (Angular / TypeScript):
+
+1. **Unit Tests** - Test services and components
+   ```bash
+   cd naar-noor
+   npm run test:ci
+   ```
+
+2. **Coverage Requirements**
+   - Services: 80%+ coverage
+   - Components: 75%+ coverage
+
+3. **E2E Tests** - For new user workflows
+   ```bash
+   npx cypress run --spec "cypress/e2e/your-feature.cy.ts"
+   ```
+
+### Running Tests Locally
+
+```bash
+# Backend - all tests
+cd api-server && dotnet test
+
+# Backend - specific layer
+dotnet test --filter "Category=Domain"
+
+# Frontend - unit tests
+cd naar-noor && npm run test:ci
+
+# Frontend - E2E tests
+npx cypress run
+
+# Check coverage
+python scripts/validate-coverage.py --backend-dir api-server/tests
+```
+
+### Test-Driven Development (TDD)
+
+We recommend TDD approach:
+
+1. **Write test first** - Define expected behavior
+2. **See test fail** - Verify test is valid
+3. **Write minimum code** - Make test pass
+4. **Refactor** - Clean up code
+5. **Repeat** - For next feature
+
+## 📋 Pull Request Process
+
+1. **Create Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make Changes**
+   - Follow code style guide (see below)
+   - Write tests for all changes
+   - Update relevant documentation
+   - Add comments to complex logic
+
+3. **Run Pre-Commit Checks**
+   ```bash
+   # Backend
+   cd api-server && dotnet test && dotnet build
+
+   # Frontend
+   cd naar-noor && npm run test:ci
+
+   # Coverage validation
+   python scripts/validate-coverage.py --backend-dir api-server/tests
+   ```
+
+4. **Commit with Clear Messages**
+   ```bash
+   git commit -m "feat: add user authentication"
+   git commit -m "fix: resolve reservation date validation"
+   git commit -m "docs: update API documentation"
+   ```
+
+5. **Push to Your Fork**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+6. **Create Pull Request**
+   - Fill out PR template completely
+   - Link related issues
+   - Describe what you changed and why
+   - Include screenshots/videos if UI changes
+
+## 📏 Code Style Guide
+
+### C# (.NET)
+
+```csharp
+// PascalCase for classes, methods, properties
+public class ChefService
+{
+    // Private fields with underscore prefix
+    private readonly IRepository<Chef> _repository;
+
+    // Public methods
+    public async Task<Chef> GetChefAsync(int id)
+    {
+        return await _repository.GetByIdAsync(id);
+    }
+
+    // Private methods
+    private bool ValidateChef(Chef chef)
+    {
+        return !string.IsNullOrWhiteSpace(chef.Name);
+    }
+}
+```
+
+### TypeScript/Angular
+
+```typescript
+// PascalCase for classes
+export class ChefService {
+  // camelCase for private properties
+  private _chefs: Chef[] = [];
+
+  // camelCase for methods
+  getChefs(): Observable<Chef[]> {
+    return this.http.get<Chef[]>('/api/chefs');
+  }
+
+  // UPPER_CASE for constants
+  private readonly MAX_CHEFS = 100;
+}
+```
+
+## 🏗️ Project Structure
+
+### Backend
+
+```
+api-server/
+├── src/
+│   ├── NaarNoor.Domain/          # Business rules
+│   ├── NaarNoor.Application/     # Use cases
+│   ├── NaarNoor.Infrastructure/  # Data access
+│   └── NaarNoor.API/             # HTTP endpoints
+└── tests/
+    ├── NaarNoor.Domain.Tests/
+    ├── NaarNoor.Application.Tests/
+    ├── NaarNoor.Infrastructure.Tests/
+    └── NaarNoor.API.Tests/
+```
+
+### Frontend
+
+```
+naar-noor/
+├── src/
+│   ├── app/
+│   │   ├── components/           # Angular components
+│   │   ├── services/             # HTTP & business logic
+│   │   └── models/               # TypeScript interfaces
+│   └── test.ts
+├── cypress/                       # E2E tests
+└── karma.conf.js                 # Test configuration
+```
+
+## 🔍 Code Review Checklist
+
+When reviewing code, check:
+
+- [ ] Tests included for all changes
+- [ ] Coverage thresholds met
+- [ ] Code style consistent
+- [ ] No hardcoded values
+- [ ] Error handling implemented
+- [ ] Documentation updated
+- [ ] Comments explain "why" not "what"
+- [ ] No console.log() left in code
+- [ ] Security best practices followed
+- [ ] Performance considered
+
+## 📝 Documentation
+
+### Code Comments
+
+```csharp
+// ✅ Good - explains why
+// Cache the chef list for 1 hour to reduce database queries
+var chefs = await GetChefsFromCacheAsync();
+
+// ❌ Bad - obvious from code
+// Get chefs from cache
+```
+
+### Commit Messages
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add authentication to API
+fix: resolve chef reservation date validation
+docs: update API documentation
+style: format code per guidelines
+refactor: extract Chef validation logic
+test: add property tests for pagination
+```
+
+## 🐛 Reporting Bugs
+
+### Bug Report Template
+
+- **Description** - What is broken?
+- **Steps to Reproduce** - How to trigger the bug?
+- **Expected Behavior** - What should happen?
+- **Actual Behavior** - What happens instead?
+- **Screenshots** - Visual proof (if applicable)
+- **Environment** - OS, browser, versions
+- **Additional Context** - Any other info?
+
+## 💡 Feature Requests
+
+### Feature Request Template
+
+- **Problem** - What problem does this solve?
+- **Proposed Solution** - How should it work?
+- **Alternatives** - Other approaches considered?
+- **Additional Context** - Why is this important?
+
+## 📞 Getting Help
+
+- **Questions** - Use GitHub Discussions
+- **Issues** - Create GitHub Issues
+- **Chat** - Community Discord (link TBD)
+
+## ✨ Thank You!
+
+Thank you for contributing to Naar & Noor! Your efforts help make this project better for everyone. We appreciate your time and effort!

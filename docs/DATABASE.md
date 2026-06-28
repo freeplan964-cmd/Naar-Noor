@@ -541,3 +541,142 @@ dotnet ef database update --project src/NaarNoor.Infrastructure
 ---
 
 **Need Help?** Check the [Troubleshooting Guide](./TROUBLESHOOTING.md).
+
+
+## 📋 Migrations
+
+### Applying Migrations
+
+**Initial Setup:**
+```bash
+cd api-server
+dotnet ef database update
+```
+
+**After Creating New Migration:**
+```bash
+# Add migration
+dotnet ef migrations add "DescriptionOfChange"
+
+# Apply migration
+dotnet ef database update
+
+# Revert to previous migration
+dotnet ef database update PreviousMigrationName
+
+# List all migrations
+dotnet ef migrations list
+```
+
+### Creating Migrations
+
+```bash
+# Generate migration for changes
+dotnet ef migrations add AddChefSpecialization
+
+# Generate migration from specific DbContext
+dotnet ef migrations add AddOrder --context ApplicationDbContext
+
+# Remove last unapplied migration
+dotnet ef migrations remove
+```
+
+## 🌱 Data Seeding
+
+### Seed Data Location
+
+Seeding logic in: `api-server/src/NaarNoor.Infrastructure/Persistence/DatabaseSeeder.cs`
+
+### Run Seed on Application Start
+
+Automatic seeding in middleware: `NaarNoor.API/Middleware/DatabaseSeedingMiddleware.cs`
+
+### Manual Seeding
+
+```csharp
+// In Program.cs or migrations
+using (var context = new ApplicationDbContext(options))
+{
+    context.Database.EnsureCreated();
+    DatabaseSeeder.SeedAsync(context).Wait();
+}
+```
+
+### Seed Data Included
+
+- 5 Chefs with specializations and ratings
+- 20 Menu Items across categories
+- 10 Reservations with various statuses
+- 15 Reviews and ratings
+- Contact inquiries sample data
+
+## 📊 Database Schema
+
+### Entities
+
+**Chef**
+- Id (PK), Name, Specialization, YearsOfExperience, Rating (0-5)
+
+**MenuItem**
+- Id (PK), Name, Category, Price, IsAvailable
+
+**Reservation**
+- Id (PK), ChefId (FK), Date, PartySize, Status, CreatedAt
+
+**Order**
+- Id (PK), ReservationId (FK), Status, TotalPrice, CreatedAt
+
+**OrderItem**
+- Id (PK), OrderId (FK), MenuItemId (FK), Quantity, UnitPrice
+
+**Review**
+- Id (PK), ChefId (FK), Rating (1-5), Comment, IsApproved, CreatedAt
+
+**ContactInquiry**
+- Id (PK), Name, Email, Message, CreatedAt, IsResolved
+
+## 🔗 Relationships
+
+- Chef → Reservations (1:N, Cascade Delete)
+- Chef → Reviews (1:N, Cascade Delete)
+- Reservation → Orders (1:N, Cascade Delete)
+- Order → OrderItems (1:N, Cascade Delete)
+- MenuItem ← OrderItems (1:N)
+
+## 🧪 Testing
+
+### In-Memory Database for Tests
+
+```csharp
+var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+    .UseInMemoryDatabase("TestDb_" + Guid.NewGuid())
+    .Options;
+```
+
+See: `api-server/tests/NaarNoor.Infrastructure.Tests/Persistence/`
+
+## 🔐 Data Protection
+
+- NOT NULL constraints on critical fields
+- UNIQUE constraints for identifiers
+- CHECK constraints: Price >= 0, Rating 0-5, PartySize > 0
+- DEFAULT: CreatedAt = GETUTCDATE()
+
+## 📈 Performance
+
+### Indexes
+
+- Primary: Chef.Id, MenuItem.Id, Reservation.Id, Order.Id
+- Foreign: Reservation.ChefId, Reservation.Status, Review.ChefId
+
+### Query Optimization
+
+Use `.Include()` to prevent N+1 queries and filter before `.Select()`
+
+## 🚀 Deployment
+
+1. Create database on SQL Server
+2. Update connection string in `appsettings.Production.json`
+3. Run: `dotnet ef database update --configuration Release`
+4. Seed initial data (optional)
+5. Regular backups recommended

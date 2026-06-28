@@ -522,3 +522,375 @@ var response = await client.PostAsync("http://localhost:8080/api/reservations", 
 ---
 
 **Need Help?** Open an issue on [GitHub](https://github.com/Mostafa-SAID7/Naar-Noor/issues).
+
+
+## 👨‍🍳 Chefs Endpoints
+
+### Get All Chefs
+
+```http
+GET /api/chefs
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Chef Marco",
+    "specialization": "Italian",
+    "yearsOfExperience": 15,
+    "rating": 4.8
+  }
+]
+```
+
+### Get Chef by ID
+
+```http
+GET /api/chefs/{id}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "name": "Chef Marco",
+  "specialization": "Italian",
+  "yearsOfExperience": 15,
+  "rating": 4.8
+}
+```
+
+## 🍽️ Menu Endpoints
+
+### Get All Menu Items
+
+```http
+GET /api/menu
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Pasta Carbonara",
+    "category": "Italian",
+    "price": 14.99,
+    "isAvailable": true
+  }
+]
+```
+
+### Get Menu Item by ID
+
+```http
+GET /api/menu/{id}
+```
+
+### Create Menu Item (Admin Only)
+
+```http
+POST /api/menu
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "New Dish",
+  "category": "Italian",
+  "price": 18.50,
+  "isAvailable": true
+}
+```
+
+## 📅 Reservations Endpoints
+
+### Get All Reservations
+
+```http
+GET /api/reservations
+```
+
+### Create Reservation
+
+```http
+POST /api/reservations
+Content-Type: application/json
+
+{
+  "chefId": 1,
+  "date": "2026-07-15T19:00:00",
+  "partySize": 4,
+  "specialRequests": "Window seat preferred"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "chefId": 1,
+  "date": "2026-07-15T19:00:00",
+  "partySize": 4,
+  "status": "Pending",
+  "createdAt": "2026-06-28T10:30:00"
+}
+```
+
+### Get Reservation by ID
+
+```http
+GET /api/reservations/{id}
+```
+
+### Update Reservation
+
+```http
+PUT /api/reservations/{id}
+Content-Type: application/json
+
+{
+  "partySize": 5,
+  "specialRequests": "Updated requests"
+}
+```
+
+### Cancel Reservation
+
+```http
+DELETE /api/reservations/{id}
+```
+
+## 🛒 Orders Endpoints
+
+### Get All Orders
+
+```http
+GET /api/orders
+```
+
+### Create Order
+
+```http
+POST /api/orders
+Content-Type: application/json
+
+{
+  "reservationId": 1,
+  "items": [
+    {
+      "menuItemId": 1,
+      "quantity": 2
+    },
+    {
+      "menuItemId": 3,
+      "quantity": 1
+    }
+  ]
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "reservationId": 1,
+  "items": [
+    {
+      "id": 1,
+      "menuItemId": 1,
+      "quantity": 2,
+      "unitPrice": 14.99
+    }
+  ],
+  "totalPrice": 44.97,
+  "status": "Pending",
+  "createdAt": "2026-06-28T10:35:00"
+}
+```
+
+### Get Order by ID
+
+```http
+GET /api/orders/{id}
+```
+
+### Update Order Status
+
+```http
+PATCH /api/orders/{id}/status
+Content-Type: application/json
+
+{
+  "status": "Confirmed"
+}
+```
+
+## ⭐ Reviews Endpoints
+
+### Get Reviews for Chef
+
+```http
+GET /api/chefs/{chefId}/reviews
+```
+
+### Submit Review
+
+```http
+POST /api/reviews
+Content-Type: application/json
+
+{
+  "chefId": 1,
+  "rating": 5,
+  "comment": "Excellent experience!"
+}
+```
+
+## 📞 Contact Endpoints
+
+### Submit Inquiry
+
+```http
+POST /api/contact
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "message": "I have a question about your services"
+}
+```
+
+## 🔐 Authentication (Future)
+
+JWT-based authentication will be implemented:
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "expiresIn": 3600,
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "role": "Customer"
+  }
+}
+```
+
+### Using Bearer Token
+
+```http
+GET /api/protected-endpoint
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+## ❌ Error Responses
+
+### 400 Bad Request
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "PartySize": ["Party size must be greater than 0"]
+  }
+}
+```
+
+### 404 Not Found
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.4",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "Chef with ID 999 not found"
+}
+```
+
+### 401 Unauthorized
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7235#section-3.1",
+  "title": "Unauthorized",
+  "status": 401,
+  "detail": "Invalid or missing authentication token"
+}
+```
+
+### 500 Internal Server Error
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+  "title": "Internal Server Error",
+  "status": 500,
+  "detail": "An unexpected error occurred"
+}
+```
+
+## 📊 Status Codes
+
+| Code | Meaning |
+|------|---------|
+| 200 | OK - Request successful |
+| 201 | Created - Resource created |
+| 204 | No Content - Success with no data |
+| 400 | Bad Request - Invalid input |
+| 401 | Unauthorized - Authentication required |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Not Found - Resource doesn't exist |
+| 422 | Unprocessable Entity - Validation failed |
+| 500 | Internal Server Error - Server error |
+
+## 🔄 Common Workflows
+
+### Complete Reservation Flow
+
+```bash
+# 1. Get available chefs
+GET /api/chefs
+
+# 2. Get menu
+GET /api/menu
+
+# 3. Create reservation
+POST /api/reservations
+{
+  "chefId": 1,
+  "date": "2026-07-15T19:00:00",
+  "partySize": 4
+}
+# → Returns reservationId
+
+# 4. Create order
+POST /api/orders
+{
+  "reservationId": 1,
+  "items": [{"menuItemId": 1, "quantity": 2}]
+}
+
+# 5. Submit review (after dining)
+POST /api/reviews
+{
+  "chefId": 1,
+  "rating": 5,
+  "comment": "Great!"
+}
+```
